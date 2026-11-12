@@ -28,12 +28,13 @@ for (const snap of snapshots) {
 const horizons = [4, 8, 16, 24, 36, 48, 60, 72];
 const spread = [[1.3, 3.1, 6.3, 13, 17.4], [2.5, 5.4, 9.6, 14.8, 20.3], [4.1, 8.9, 13.6, 18.8, 24.4], [5.8, 10.9, 16.5, 22.5, 26.7]];
 const edges = [6, 12, 24, 48];
+const knots = [3, 9, 18, 36, 72];
 function band(rank: number): number { return rank <= 10 ? 0 : rank <= 20 ? 1 : rank <= 40 ? 2 : 3; }
 function sigma(rank: number, h: number): number {
   const values = spread[band(rank)]!;
   let priorH = 0, priorV = 0.9;
   for (let i = 0; i < edges.length + 1; i++) {
-    const nextH = i < edges.length ? [3, 9, 18, 36, 72][i]! : 72;
+    const nextH = i < edges.length ? knots[i]! : 72;
     const nextV = values[i]!;
     if (h <= nextH) return Math.max(0.9, priorV + (h - priorH) / (nextH - priorH) * (nextV - priorV));
     priorH = nextH; priorV = nextV;
