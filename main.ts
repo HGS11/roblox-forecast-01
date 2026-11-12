@@ -26,6 +26,8 @@ for (const snap of snapshots) {
 }
 
 const horizons = [4, 8, 16, 24, 36, 48, 60, 72];
+const SPREAD_SCALE = 0.35;
+const NAMED_SHARE = 0.8;
 const spread = [[1.3, 3.1, 6.3, 13, 17.4], [2.5, 5.4, 9.6, 14.8, 20.3], [4.1, 8.9, 13.6, 18.8, 24.4], [5.8, 10.9, 16.5, 22.5, 26.7]];
 const edges = [6, 12, 24, 48];
 const knots = [3, 9, 18, 36, 72];
@@ -67,7 +69,7 @@ for (const g of games.values()) {
     let p = 0;
     for (const h of horizons) {
       const mu = Math.max(0.5, Math.min(130, center + velocity * h + 0.1 * absent));
-      const sd = 0.35 * sigma(last.rank, h);
+      const sd = SPREAD_SCALE * sigma(last.rank, h);
       const occupancy = cdf((place + 0.5 - mu) / sd) - cdf((place - 0.5 - mu) / sd);
       p += occupancy * Math.exp(-hazard * h - 0.02 * absent);
     }
@@ -80,7 +82,7 @@ for (let place = 1; place <= task.places; place++) {
   const candidates = forecast.map((g) => ({ id: g.id, p: g.mass[place - 1]! })).filter((x) => x.p >= 0.0005).sort((a, b) => b.p - a.p || a.id - b.id).slice(0, 100);
   const total = candidates.reduce((s, x) => s + x.p, 0);
   for (const x of candidates) {
-    const p = Math.min(0.65, x.p * 0.8 / total);
+    const p = Math.min(0.65, x.p * NAMED_SHARE / total);
     if (p >= 0.0005) probabilities.push({ universe_id: x.id, place, p });
   }
 }
